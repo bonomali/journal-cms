@@ -1,14 +1,13 @@
 ---
 # Available `vagrant_box` values include:
-#   - beet/box (pre-provisioned, based on Ubuntu 16.04)
-#   - geerlingguy/drupal-vm (pre-provisioned, based on Ubuntu 16.04)
+#   - geerlingguy/drupal-vm (pre-provisioned, based on Ubuntu 18.04)
 #   - geerlingguy/centos7
 #   - geerlingguy/centos6
 #   - geerlingguy/debian9
 #   - geerlingguy/debian8
 #   - geerlingguy/ubuntu1804
 #   - geerlingguy/ubuntu1604
-vagrant_box: geerlingguy/drupal-vm
+vagrant_box: geerlingguy/ubuntu1804
 
 vagrant_user: vagrant
 vagrant_synced_folder_default_type: nfs
@@ -43,8 +42,8 @@ vagrant_cpus: 4
 
 # Ensure vagrant plugins are installed.
 vagrant_plugins:
-- name: vagrant-vbguest
-- name: vagrant-hostsupdater
+  - name: vagrant-vbguest
+  - name: vagrant-hostsupdater
 
 # Minimum required versions.
 drupalvm_vagrant_version_min: '1.8.6'
@@ -126,7 +125,7 @@ apache_vhost_php_fpm_parameters: |
 # View the geerlingguy.apache Ansible Role README for more options.
 apache_vhosts:
   - servername: "{{ drupal_domain }}"
-    serveralias: "*.vagrantshare.com"
+    serveralias: "www.{{ drupal_domain }}"
     documentroot: "{{ drupal_core_path }}"
     extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
 
@@ -134,9 +133,9 @@ apache_vhosts:
     documentroot: "{{ adminer_install_dir }}"
     extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
 
-  - servername: "xhprof.{{ vagrant_hostname }}"
-    documentroot: "{{ php_xhprof_html_dir }}"
-    extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
+#  - servername: "xhprof.{{ vagrant_hostname }}"
+#    documentroot: "{{ php_xhprof_html_dir }}"
+#    extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
 
   - servername: "pimpmylog.{{ vagrant_hostname }}"
     documentroot: "{{ pimpmylog_install_dir }}"
@@ -161,7 +160,7 @@ apache_mods_enabled:
 # here. Set the 'is_php' property for document roots that contain PHP apps like
 # Drupal.
 nginx_hosts:
-  - server_name: "{{ drupal_domain }} *.vagrantshare.com"
+  - server_name: "{{ drupal_domain }} www.{{ drupal_domain }}"
     root: "{{ drupal_core_path }}"
     is_php: true
 
@@ -169,9 +168,9 @@ nginx_hosts:
     root: "{{ adminer_install_dir }}"
     is_php: true
 
-  - server_name: "xhprof.{{ vagrant_hostname }}"
-    root: "{{ php_xhprof_html_dir }}"
-    is_php: true
+#  - server_name: "xhprof.{{ vagrant_hostname }}"
+#    root: "{{ php_xhprof_html_dir }}"
+#    is_php: true
 
   - server_name: "pimpmylog.{{ vagrant_hostname }}"
     root: "{{ pimpmylog_install_dir }}"
@@ -227,23 +226,13 @@ installed_extras:
   # - solr
   # - tideways
   # - upload-progress
-  - varnish
-  - xdebug
+  # - varnish
+  # - xdebug
   # - xhprof # use `tideways` if you're installing PHP 7+
 
 # Add any extra apt or yum packages you would like installed.
 extra_packages:
   - sqlite
-
-# `nodejs` must be in installed_extras for this to work. Valid examples: "0.10",
-# "0.12", "4.x", "5.x".
-nodejs_version: "0.12"
-nodejs_npm_global_packages: []
-nodejs_install_npm_user: "{{ drupalvm_user }}"
-
-# `ruby` must be in installed_extras for this to work.
-ruby_install_gems_user: "{{ drupalvm_user }}"
-ruby_install_gems: []
 
 # You can configure almost anything else on the server in the rest of this file.
 extra_security_enabled: false
@@ -268,7 +257,7 @@ firewall_log_dropped_packets: false
 firewall_disable_firewalld: true
 firewall_disable_ufw: true
 
-# PHP Configuration. Currently-supported versions: 5.6, 7.0, 7.1, 7.2.
+# PHP Configuration. Currently-supported versions: 7.1, 7.2, 7.3.
 # See version-specific notes: http://docs.drupalvm.com/en/latest/configurations/php/
 php_version: "7.1"
 php_install_recommends: no
@@ -314,9 +303,10 @@ mysql_query_cache_size: "32M"
 adminer_install_filename: index.php
 
 # Node.js configuration (if enabled above).
-# Valid examples: "0.10", "0.12", "4.x", "5.x".
-nodejs_version: "0.12"
-nodejs_npm_global_packages: []
+# Valid examples: "6.x", "8.x", "10.x", etc.
+nodejs_version: "10.x"
+nodejs_npm_global_packages:
+  - name: npm
 nodejs_install_npm_user: "{{ drupalvm_user }}"
 npm_config_prefix: "/home/{{ drupalvm_user }}/.npm-global"
 
